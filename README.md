@@ -1,6 +1,6 @@
 # Word Guard
 
-Free, do-it-yourself porn and distraction blocking for your computer and Android phone. It has three layers that cover each other's gaps:
+Free, do-it-yourself blocking of bad stuff and distractions for your computer and Android phone. It has three layers that cover each other's gaps:
 
 | Layer | What it blocks | Where |
 |---|---|---|
