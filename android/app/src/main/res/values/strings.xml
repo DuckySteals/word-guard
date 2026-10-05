@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="service_description">Blocks browser pages, searches and YouTube videos that contain your blocked words.</string>
+</resources>

@@ -1,0 +1,29 @@
+{
+  "manifest_version": 3,
+  "name": "Word Filter",
+  "version": "1.2.0",
+  "description": "Blocks pages and searches that match blocked words, and hides matching YouTube videos. Word list is set by system policy.",
+  "permissions": ["storage"],
+  "storage": { "managed_schema": "schema.json" },
+  "content_scripts": [
+    {
+      "matches": ["*://*.youtube.com/*"],
+      "js": ["common.js", "content.js"],
+      "css": ["content.css"],
+      "run_at": "document_start"
+    },
+    {
+      "matches": ["<all_urls>"],
+      "exclude_matches": ["*://*.youtube.com/*"],
+      "js": ["common.js", "general.js"],
+      "run_at": "document_start",
+      "all_frames": false
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": ["blocked.html", "default-words.txt"],
+      "matches": ["<all_urls>"]
+    }
+  ]
+}

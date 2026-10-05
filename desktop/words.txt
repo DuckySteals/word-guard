@@ -1,0 +1,59 @@
+# YouTube Word Filter — blocked words
+# One entry per line. Matching ignores case and only matches whole words
+# (so "sex" will not hide "Essex"). Write /regex/ for a raw regular expression.
+# Lines starting with # are ignored.
+# After editing the installed copy (/etc/yt-word-filter/words.txt), run: sudo yt-filter-apply
+
+porn
+porno
+pornography
+nsfw
+xxx
+18+
+onlyfans
+only fans
+fansly
+nude
+nudes
+nudity
+naked
+sex
+sexy
+sexual
+sexually
+erotic
+erotica
+hentai
+lewd
+seductive
+seduce
+seduction
+sensual
+lingerie
+/\bbikinis?\b(?!\s+bottom)/
+micro bikini
+swimsuit try on
+try on haul
+see through
+see-through
+braless
+no bra
+twerk
+twerking
+thirst trap
+stripper
+striptease
+pole dance
+lap dance
+boobs
+booty
+cleavage
+camgirl
+cam girl
+hot girl
+hot girls
+hot women
+baddie
+baddies
+/\bspicy\s+(video|content|scenes?)\b/
+/\b(kiss|bed|love|steamy)\s+scenes?\b/

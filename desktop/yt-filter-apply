@@ -1,0 +1,66 @@
+#!/usr/bin/env python3
+"""Writes browser policies from /etc/yt-word-filter. Run with sudo after editing words.txt."""
+import json
+import os
+import pathlib
+import subprocess
+import sys
+
+CONF = pathlib.Path("/etc/yt-word-filter")
+EXT_ID = (CONF / "extension-id").read_text().strip()
+NEXTDNS_FILE = CONF / "nextdns-id"
+
+if os.geteuid() != 0:
+    sys.exit("Run with sudo: sudo yt-filter-apply")
+
+patterns = [
+    line.strip()
+    for line in (CONF / "words.txt").read_text().splitlines()
+    if line.strip() and not line.strip().startswith("#")
+]
+nextdns = NEXTDNS_FILE.read_text().strip() if NEXTDNS_FILE.exists() else ""
+
+policy = {
+    "ExtensionSettings": {
+        EXT_ID: {
+            "installation_mode": "force_installed",
+            "update_url": "file:///opt/yt-word-filter/update.xml",
+        }
+    },
+    "3rdparty": {"extensions": {EXT_ID: {"patterns": patterns, "hideShorts": True}}},
+    "IncognitoModeAvailability": 1,
+    "BrowserGuestModeEnabled": False,
+    "ForceGoogleSafeSearch": True,
+}
+if nextdns:
+    policy["DnsOverHttpsMode"] = "secure"
+    policy["DnsOverHttpsTemplates"] = f"https://dns.nextdns.io/{nextdns}"
+
+for browser, extra in (("chromium", {}), ("brave", {"TorDisabled": True})):
+    path = pathlib.Path(f"/etc/{browser}/policies/managed/blocker.json")
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(policy | extra, indent=2))
+    path.chmod(0o644)
+
+dropin = pathlib.Path("/etc/systemd/resolved.conf.d/nextdns.conf")
+if nextdns:
+    dropin.parent.mkdir(parents=True, exist_ok=True)
+    servers = ["45.90.28.0", "2a07:a8c0::", "45.90.30.0", "2a07:a8c1::"]
+    dropin.write_text(
+        "[Resolve]\n"
+        + "".join(f"DNS={ip}#{nextdns}.dns.nextdns.io\n" for ip in servers)
+        + "DNSOverTLS=yes\nDomains=~.\n"
+    )
+    # Stop NetworkManager handing the router's DNS to resolved, which would bypass NextDNS
+    nm = pathlib.Path("/etc/NetworkManager/conf.d/90-nextdns.conf")
+    nm.parent.mkdir(parents=True, exist_ok=True)
+    nm.write_text("[main]\ndns=none\n")
+    subprocess.run(["systemctl", "reload", "NetworkManager"], check=False)
+    subprocess.run(["systemctl", "restart", "systemd-resolved"], check=True)
+    devices = subprocess.run(["nmcli", "-t", "-f", "DEVICE", "device"], capture_output=True, text=True).stdout.split()
+    for dev in devices:
+        if dev not in ("lo", "tailscale0"):
+            subprocess.run(["resolvectl", "revert", dev], check=False)
+
+print(f"Applied {len(patterns)} blocked words" + (f", NextDNS {nextdns}" if nextdns else ", no NextDNS ID set"))
+print("Restart Chromium/Brave, then check chrome://policy and brave://policy.")

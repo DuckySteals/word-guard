@@ -1,0 +1,43 @@
+/* Keep the page hidden until the word list has loaded */
+html.ywf-loading ytd-app,
+html.ywf-loading ytm-app {
+  visibility: hidden !important;
+}
+
+[data-ywf-hidden] {
+  display: none !important;
+}
+
+html.ywf-no-shorts ytd-reel-shelf-renderer,
+html.ywf-no-shorts ytd-rich-shelf-renderer[is-shorts],
+html.ywf-no-shorts ytd-rich-section-renderer:has(ytd-rich-shelf-renderer[is-shorts]),
+html.ywf-no-shorts grid-shelf-view-model:has(ytm-shorts-lockup-view-model),
+html.ywf-no-shorts grid-shelf-view-model:has(ytm-shorts-lockup-view-model-v2),
+html.ywf-no-shorts ytd-guide-entry-renderer:has(a[title="Shorts"]),
+html.ywf-no-shorts ytd-mini-guide-entry-renderer[aria-label="Shorts"],
+html.ywf-no-shorts yt-tab-shape[tab-title="Shorts"],
+html.ywf-no-shorts ytd-video-renderer:has(a[href^="/shorts/"]),
+html.ywf-no-shorts ytd-rich-item-renderer:has(a[href^="/shorts/"]) {
+  display: none !important;
+}
+
+#ywf-block {
+  position: fixed;
+  inset: 0;
+  z-index: 2147483647;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  background: #0f0f0f;
+  color: #f1f1f1;
+  font: 18px/1.4 Roboto, Arial, sans-serif;
+  text-align: center;
+  padding: 24px;
+}
+
+#ywf-block a {
+  color: #3ea6ff;
+  font-size: 16px;
+}

@@ -1,0 +1,11 @@
+# Extension signing key — never commit
+*.pem
+desktop/dist/
+*.crx
+
+# Android build output
+android/.gradle/
+android/app/build/
+android/build/
+android/local.properties
+*.apk
