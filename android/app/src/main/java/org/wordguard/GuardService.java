@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.SystemClock;
+import android.util.Log;
 import android.view.accessibility.AccessibilityEvent;
 import android.view.accessibility.AccessibilityNodeInfo;
 import android.widget.Toast;
@@ -26,11 +27,17 @@ public class GuardService extends AccessibilityService {
 
     private static final Set<String> YOUTUBE = Set.of(
             "com.google.android.youtube", "app.morphe.android.youtube", "app.revanced.android.youtube",
-            "com.vanced.android.youtube", "org.schabi.newpipe", "com.github.libretube");
+            "com.vanced.android.youtube", "org.schabi.newpipe", "com.github.libretube",
+            // Android TV / Google TV
+            "com.google.android.youtube.tv", "com.google.android.youtube.tvkids",
+            "com.teamsmart.videomanager.tv", "com.liskovsoft.smarttubetv.beta");
 
     private static final Set<String> SETTINGS = Set.of(
             "com.android.settings", "com.google.android.packageinstaller", "com.android.packageinstaller",
-            "com.google.android.permissioncontroller", "com.android.permissioncontroller");
+            "com.google.android.permissioncontroller", "com.android.permissioncontroller",
+            "com.android.tv.settings", "com.google.android.tv.settings");
+
+    private static final String TAG = "WordGuard";
 
     private static final String APP_NAME = "Word Guard";
     private static final String[] PROTECTED_ACTIONS = {
@@ -65,7 +72,10 @@ public class GuardService extends AccessibilityService {
     public void onAccessibilityEvent(AccessibilityEvent event) {
         if (event.getPackageName() == null) return;
         String pkg = event.getPackageName().toString();
-        if (!BROWSERS.contains(pkg) && !YOUTUBE.contains(pkg) && !SETTINGS.contains(pkg)) return;
+        if (debug() && event.getEventType() == AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED) {
+            Log.d(TAG, "window: " + pkg + " / " + event.getClassName());
+        }
+        if (!BROWSERS.contains(pkg) && !YOUTUBE.contains(pkg) && !isSettings(pkg)) return;
         // Coalesce bursts of events into one check
         pendingPackage = pkg;
         handler.removeCallbacks(check);
@@ -79,8 +89,9 @@ public class GuardService extends AccessibilityService {
 
         List<AccessibilityNodeInfo> nodes = new ArrayList<>();
         collect(root, nodes, 0);
+        if (debug()) dump(pkg, nodes);
 
-        if (SETTINGS.contains(pkg)) {
+        if (isSettings(pkg)) {
             if (isProtectedScreen(nodes)) block("Word Guard is protected");
         } else if (BROWSERS.contains(pkg)) {
             for (AccessibilityNodeInfo n : nodes) {
@@ -97,6 +108,27 @@ public class GuardService extends AccessibilityService {
                 }
             }
         }
+    }
+
+    // TV makers ship their own settings apps under various names
+    private static boolean isSettings(String pkg) {
+        return SETTINGS.contains(pkg) || pkg.endsWith(".settings") || pkg.contains("tvsettings");
+    }
+
+    // Enable with: adb shell setprop log.tag.WordGuard DEBUG
+    private static boolean debug() {
+        return Log.isLoggable(TAG, Log.DEBUG);
+    }
+
+    private static void dump(String pkg, List<AccessibilityNodeInfo> nodes) {
+        StringBuilder sb = new StringBuilder("dump " + pkg + " (" + nodes.size() + " nodes)");
+        for (AccessibilityNodeInfo n : nodes) {
+            String t = textOf(n).trim();
+            if (t.isEmpty()) continue;
+            sb.append("\n  [").append(n.getClassName()).append(" ").append(n.getViewIdResourceName())
+                    .append("] ").append(t);
+        }
+        for (String line : sb.toString().split("\n")) Log.d(TAG, line);
     }
 
     private static void collect(AccessibilityNodeInfo node, List<AccessibilityNodeInfo> out, int depth) {

@@ -92,6 +92,50 @@ echo "sdk.dir=$HOME/Android/Sdk" > local.properties
 
 ---
 
+## 4. Android TV / Google TV (e.g. Sony Bravia)
+
+The same app works on Android TV and Google TV. It covers the TV **YouTube** app, YouTube Kids and SmartTube, and protects the TV's Settings. A TV can't open an APK by itself, so install it from a computer on the **same network** as the TV.
+
+### On the TV
+1. **Settings → System → About**, then click **Android TV OS build** 7 times until it says you're a developer.
+2. **Settings → System → Developer options** → turn on **USB debugging**.
+3. **Settings → Network & Internet** → click the connection and note the **IP address**.
+
+### On the computer (Windows PowerShell)
+```powershell
+# adb (Android platform-tools)
+Invoke-WebRequest https://dl.google.com/android/repository/platform-tools-latest-windows.zip -OutFile pt.zip
+Expand-Archive pt.zip -DestinationPath . -Force
+$adb = ".\platform-tools\adb.exe"
+
+# Word Guard
+Invoke-WebRequest https://github.com/DuckySteals/word-guard/releases/latest/download/WordGuard.apk -OutFile WordGuard.apk
+
+& $adb connect TV_IP:5555        # the TV asks "Allow USB debugging?": tick Always allow, OK
+& $adb install -r WordGuard.apk
+& $adb shell settings put secure enabled_accessibility_services org.wordguard/org.wordguard.GuardService
+& $adb shell settings put secure accessibility_enabled 1
+```
+On Mac or Linux, use the same `adb` commands.
+
+Then open **Word Guard** from the TV's apps row and have your partner **set the PIN**.
+
+### Checking it works
+Search YouTube on the TV for a blocked word. It should back straight out.
+
+If it doesn't, turn on the debug log, open the screen in question, and read what Word Guard sees:
+```powershell
+& $adb shell setprop log.tag.WordGuard DEBUG
+& $adb logcat -c
+# ...use the TV for a moment...
+& $adb logcat -d -s WordGuard
+```
+A `window:` line shows each app or screen that opens, and `dump` lines list the text Word Guard can read. If YouTube's titles aren't there, that app can't be filtered by words, so block the YouTube app instead. Turn the log off with `setprop log.tag.WordGuard ""`.
+
+Afterwards, turn **USB debugging** off on the TV, so nobody else on the network can connect to it.
+
+---
+
 ## Limits
 - **Images:** Words can only catch text. A bad image under an innocent title gets through. NextDNS blocks the porn sites themselves. For screen-scanning AI on Android, [Bulldog Blocker](https://play.google.com/store/apps/details?id=com.everaccountable.bulldog) (free) pairs well with this.
 - **Admin access:** Anyone with admin rights on the computer can undo the Linux setup. The NextDNS password is the real lock, so give it to your partner.
