@@ -18,6 +18,7 @@ final class Words {
     private static final String PREFS = "wordguard";
     private static final String KEY_WORDS = "words";
     private static final String KEY_PIN = "pin_hash";
+    private static final String KEY_PAUSED_UNTIL = "paused_until";
 
     private Words() {}
 
@@ -78,6 +79,19 @@ final class Words {
 
     static boolean checkPin(Context c, String pin) {
         return hash(pin).equals(prefs(c).getString(KEY_PIN, ""));
+    }
+
+    /** Blocking is skipped until this wall-clock time; Long.MAX_VALUE means off until resumed. */
+    static void pauseUntil(Context c, long until) {
+        prefs(c).edit().putLong(KEY_PAUSED_UNTIL, until).apply();
+    }
+
+    static long pausedUntil(Context c) {
+        return prefs(c).getLong(KEY_PAUSED_UNTIL, 0);
+    }
+
+    static boolean isPaused(Context c) {
+        return System.currentTimeMillis() < pausedUntil(c);
     }
 
     private static String hash(String s) {

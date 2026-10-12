@@ -83,7 +83,7 @@ public class GuardService extends AccessibilityService {
     }
 
     private void inspect(String pkg) {
-        if (SystemClock.uptimeMillis() < cooldownUntil) return;
+        if (SystemClock.uptimeMillis() < cooldownUntil || Words.isPaused(this)) return;
         AccessibilityNodeInfo root = getRootInActiveWindow();
         if (root == null || root.getPackageName() == null || !pkg.equals(root.getPackageName().toString())) return;
 

@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.text.InputType;
+import android.text.format.DateFormat;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
@@ -13,6 +14,8 @@ import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import java.util.Date;
 
 public class MainActivity extends Activity {
 
@@ -82,15 +85,32 @@ public class MainActivity extends Activity {
             toast("Saved");
             showUnlock();
         });
+        if (Words.isPaused(this)) {
+            button("Resume blocking", v -> pause(0, "Blocking resumed"));
+        } else {
+            button("Pause blocking for 1 hour", v -> pause(System.currentTimeMillis() + 3_600_000L, "Paused for 1 hour"));
+            button("Turn off blocking", v -> pause(Long.MAX_VALUE, "Blocking is off"));
+        }
         button("Change PIN", v -> showSetPin());
         button("Lock", v -> showUnlock());
+    }
+
+    private void pause(long until, String message) {
+        Words.pauseUntil(this, until);
+        toast(message);
+        showEditor();
     }
 
     private void statusAndSettings() {
         String enabled = Settings.Secure.getString(getContentResolver(),
                 Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES);
         boolean on = enabled != null && enabled.contains(getPackageName());
-        note(on ? "Status: ON — blocking is active." : "Status: OFF — turn on Word Guard in Accessibility settings.");
+        long until = Words.pausedUntil(this);
+        if (!on) note("Status: OFF — turn on Word Guard in Accessibility settings.");
+        else if (until == Long.MAX_VALUE) note("Status: TURNED OFF — unlock with the PIN to resume.");
+        else if (Words.isPaused(this)) note("Status: PAUSED until "
+                + DateFormat.getTimeFormat(this).format(new Date(until)) + ".");
+        else note("Status: ON — blocking is active.");
         if (!on) {
             button("Open Accessibility settings",
                     v -> startActivity(new Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS)));

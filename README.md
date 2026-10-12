@@ -70,6 +70,7 @@ An Accessibility service that reads what's on screen and presses **Back** when i
 - **YouTube** (official, ReVanced, Morphe, NewPipe, LibreTube): checks every title on screen
 - **Settings:** blocks the screens for uninstalling Word Guard, turning it off, or changing **Private DNS**, which also protects NextDNS
 - **Word list:** editable inside the app, behind a **PIN** your partner sets
+- **Pause / off switch** (v1.2): behind the same PIN, pause all blocking for 1 hour or turn it off until resumed
 
 It works entirely on the phone, with no internet or DNS needed.
 
