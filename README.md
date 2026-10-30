@@ -1,5 +1,7 @@
 # Word Guard
 
+**Easy setup guide for Android, iPhone, Windows and Mac, with downloads: https://word-guard.pages.dev**
+
 Free, do-it-yourself blocking of bad stuff and distractions for your computer and Android phone. It has three layers that cover each other's gaps:
 
 | Layer | What it blocks | Where |
