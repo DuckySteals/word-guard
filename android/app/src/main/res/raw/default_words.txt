@@ -3,7 +3,7 @@ porno
 pornography
 nsfw
 xxx
-18+
+/(?<!ages?\s)(?<![\p{L}\p{N}])18\+(?![\p{L}\p{N}])/
 onlyfans
 only fans
 fansly
@@ -51,3 +51,189 @@ baddie
 baddies
 /\bspicy\s+(video|content|scenes?)\b/
 /\b(kiss|bed|love|steamy)\s+scenes?\b/
+
+# --- Revealing clothing (English) ---
+swimsuit
+swimsuits
+swim suit
+swimwear
+swim haul
+bathing suit
+bathing suits
+monokini
+bikini body
+thong
+thongs
+g-string
+g string
+underwear
+panties
+bra
+bras
+sports bra
+bodysuit
+bodycon
+booty shorts
+short shorts
+yoga pants
+leggings haul
+leggings try on
+mini skirt
+miniskirt
+crop top
+low cut
+plunging neckline
+sheer dress
+sheer top
+revealing
+wet t-shirt
+gym girl
+gym girls
+fitness model
+
+# --- Spanish ---
+pornografía
+desnuda
+desnudas
+desnudo
+desnudos
+sin ropa
+sexo
+erótico
+erótica
+lencería
+traje de baño
+trajes de baño
+bañador
+bañadores
+biquini
+tanga
+tangas
+ropa interior
+sin sujetador
+sin brasier
+escote
+chicas calientes
+mujeres calientes
+
+# --- Portuguese ---
+pornografia
+nua
+nuas
+erótico
+sexo
+maiô
+biquíni
+roupa de banho
+moda praia
+calcinha
+sem sutiã
+gostosa
+gostosas
+decote
+
+# --- French ---
+pornographie
+nue
+nues
+érotique
+sexe
+maillot de bain
+maillots de bain
+sous-vêtements
+soutien-gorge
+sans soutien-gorge
+décolleté
+seins
+
+# --- German ---
+nackt
+nackte
+nacktheit
+erotik
+erotisch
+badeanzug
+bademode
+unterwäsche
+dessous
+ohne bh
+heiße frauen
+
+# --- Italian ---
+nuda
+nudo
+sesso
+costume da bagno
+costumi da bagno
+biancheria intima
+reggiseno
+senza reggiseno
+scollatura
+
+# --- Dutch / Polish / Turkish ---
+naakt
+badpak
+ondergoed
+nago
+naga
+nagie
+seks
+erotyka
+strój kąpielowy
+bielizna
+bez stanika
+çıplak
+erotik
+iç çamaşırı
+sütyensiz
+
+# --- Russian / Ukrainian ---
+порно
+порнография
+голая
+голые
+голый
+обнажённая
+обнаженная
+оголена
+секс
+эротика
+эротический
+купальник
+купальники
+нижнее бельё
+нижнее белье
+бикини
+без лифчика
+стриптиз
+
+# --- Indonesian / Malay / Vietnamese / Tagalog ---
+telanjang
+bugil
+seksi
+baju renang
+pakaian dalam
+tanpa bh
+khỏa thân
+đồ bơi
+áo tắm
+đồ lót
+gợi cảm
+hubad
+
+# --- Hindi ---
+पोर्न
+नग्न
+सेक्स
+सेक्सी
+अश्लील
+बिकिनी
+स्विमसूट
+अंडरवियर
+
+# --- Arabic, Chinese, Japanese, Korean, Thai (no spaces between words, so matched anywhere) ---
+/إباحي|عارية|عاري|سكس|مثيرة|ملابس داخلية|ملابس سباحة|مايوه|بكيني/
+/色情|裸体|裸體|性感|泳装|泳裝|泳衣|比基尼|内衣|內衣|情趣|走光|露点|露點/
+/エロ|ポルノ|ヌード|全裸|水着|ビキニ|下着|セクシー|グラビア/
+/야동|노출|비키니|수영복|속옷|섹시|누드|19금/
+/โป๊|เปลือย|ชุดว่ายน้ำ|บิกินี่|ชุดชั้นใน|เซ็กซี่/

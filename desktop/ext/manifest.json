@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Word Filter",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "Blocks pages and searches that match blocked words, and hides matching YouTube videos. Word list is set by system policy.",
   "permissions": ["storage"],
   "storage": { "managed_schema": "schema.json" },
