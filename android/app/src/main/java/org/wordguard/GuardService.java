@@ -44,6 +44,18 @@ public class GuardService extends AccessibilityService {
             "uninstall", "force stop", "clear storage", "clear data", "use word guard",
             "turn off", "stop word guard", "disable"};
 
+    // Controls that open a private tab: Chrome's "New Incognito tab" (menu, new-tab-page
+    // button, tab switcher pane), Firefox/Brave/DuckDuckGo "private tab", Samsung "Secret mode"
+    private static final Pattern PRIVATE_LAUNCH = Pattern.compile(
+            "\\b(new )?incognito( tabs?)?\\b|\\bnew private (tab|window)\\b|\\bprivate (tabs?|browsing)\\b"
+                    + "|\\bsecret mode\\b|\\bturn on secret mode\\b",
+            Pattern.CASE_INSENSITIVE);
+    // Text shown on a private tab's own page
+    private static final Pattern PRIVATE_PAGE = Pattern.compile(
+            "you['\u2019]ve gone incognito|you['\u2019]re in a private tab|private browsing is on"
+                    + "|you['\u2019]re using secret mode",
+            Pattern.CASE_INSENSITIVE);
+
     private final Handler handler = new Handler(Looper.getMainLooper());
     private Pattern pattern;
     private long cooldownUntil;
@@ -76,6 +88,12 @@ public class GuardService extends AccessibilityService {
             Log.d(TAG, "window: " + pkg + " / " + event.getClassName());
         }
         if (!BROWSERS.contains(pkg) && !YOUTUBE.contains(pkg) && !isSettings(pkg)) return;
+        if (event.getEventType() == AccessibilityEvent.TYPE_VIEW_CLICKED) {
+            if (BROWSERS.contains(pkg) && !Words.isPaused(this) && opensPrivateTab(event)) {
+                block("Private tabs are blocked");
+            }
+            return;
+        }
         // Coalesce bursts of events into one check
         pendingPackage = pkg;
         handler.removeCallbacks(check);
@@ -95,6 +113,10 @@ public class GuardService extends AccessibilityService {
             if (isProtectedScreen(nodes)) block("Word Guard is protected");
         } else if (BROWSERS.contains(pkg)) {
             for (AccessibilityNodeInfo n : nodes) {
+                if (PRIVATE_PAGE.matcher(textOf(n)).find()) {
+                    block("Private tabs are blocked");
+                    return;
+                }
                 if (isAddressOrSearch(n) && matches(n.getText())) {
                     block("Blocked");
                     return;
@@ -149,6 +171,19 @@ public class GuardService extends AccessibilityService {
         }
         CharSequence cls = n.getClassName();
         return cls != null && cls.toString().endsWith("EditText");
+    }
+
+    private static boolean opensPrivateTab(AccessibilityEvent event) {
+        StringBuilder sb = new StringBuilder();
+        for (CharSequence t : event.getText()) sb.append(t).append(' ');
+        if (event.getContentDescription() != null) sb.append(event.getContentDescription()).append(' ');
+        AccessibilityNodeInfo src = event.getSource();
+        if (src != null) {
+            sb.append(textOf(src));
+            String id = src.getViewIdResourceName();
+            if (id != null && id.toLowerCase().contains("incognito")) return true;
+        }
+        return PRIVATE_LAUNCH.matcher(sb).find();
     }
 
     private boolean isProtectedScreen(List<AccessibilityNodeInfo> nodes) {
